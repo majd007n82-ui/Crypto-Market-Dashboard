@@ -2,7 +2,11 @@
 
 import type { MarketDetails } from "@/types/market";
 import { useMarketTicker } from "@/hooks/useMarketTicker";
-import { formatPrice, formatSymbol, formatTimestamp } from "@/lib/formatters/market";
+import {
+  formatPrice,
+  formatSymbol,
+  formatTimestamp,
+} from "@/lib/formatters/market";
 import ChangeBadge from "@/components/ui/ChangeBadge";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import ConnectionStatusBadge from "@/components/ui/ConnectionStatusBadge";
@@ -15,7 +19,8 @@ type MarketDetailsLiveProps = {
 export default function MarketDetailsLive({
   initialMarket,
 }: MarketDetailsLiveProps) {
-  const { ticker, status } = useMarketTicker(initialMarket.symbol);
+  const { ticker, status, retry, hasLiveData, lastLiveUpdateAt } =
+    useMarketTicker(initialMarket.symbol);
 
   const market = {
     ...initialMarket,
@@ -50,27 +55,62 @@ export default function MarketDetailsLive({
             <ConnectionStatusBadge status={status} />
           </div>
 
-            <p className="mt-3 text-sm text-slate-400">
-            Last updated: {formatTimestamp(market.updatedAt)}
+          <p className="mt-3 text-sm text-slate-400">
+            Last displayed update: {formatTimestamp(market.updatedAt)}
+          </p>
+
+          {hasLiveData && lastLiveUpdateAt && (
+            <p className="mt-2 text-sm text-emerald-300">
+              Live stream active. Last live tick received at{" "}
+              {formatTimestamp(lastLiveUpdateAt)}.
             </p>
+          )}
 
-            {status === "reconnecting" && (
-  <p className="mt-2 text-sm text-sky-300">
-    Live connection lost. Reconnecting automatically...
-  </p>
-)}
+          {!hasLiveData && (
+            <p className="mt-2 text-sm text-slate-400">
+              Currently showing the latest REST-loaded market snapshot until live
+              updates arrive.
+            </p>
+          )}
 
-{status === "connecting" && (
-  <p className="mt-2 text-sm text-amber-300">
-    Establishing live market connection...
-  </p>
-)}
+          {status === "reconnecting" && (
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <p className="text-sm text-sky-300">
+                Live connection lost. Reconnecting automatically...
+              </p>
+              <button
+                type="button"
+                onClick={retry}
+                className="inline-flex items-center rounded-xl border border-sky-500/30 bg-sky-500/10 px-3 py-1.5 text-sm font-medium text-sky-200 transition hover:bg-sky-500/15"
+              >
+                Retry now
+              </button>
+            </div>
+          )}
 
-{status === "disconnected" && (
-  <p className="mt-2 text-sm text-slate-400">
-    Live updates are unavailable right now. Showing the latest loaded market data.
-  </p>
-)}
+          {status === "connecting" && (
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <p className="text-sm text-amber-300">
+                Establishing live market connection...
+              </p>
+            </div>
+          )}
+
+          {status === "disconnected" && (
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <p className="text-sm text-slate-400">
+                Live updates are unavailable right now. Showing the latest loaded
+                market data.
+              </p>
+              <button
+                type="button"
+                onClick={retry}
+                className="inline-flex items-center rounded-xl border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm font-medium text-slate-200 transition hover:border-slate-600 hover:bg-slate-700"
+              >
+                Retry connection
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-3">
