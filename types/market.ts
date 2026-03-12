@@ -17,3 +17,8 @@ export interface BinanceTickerStreamMessage {
   l: string; // low price
   v: string; // total traded base asset volume
 }
+
+export interface BinanceCombinedTickerStreamMessage {
+  stream: string;
+  data: BinanceTickerStreamMessage;
+}

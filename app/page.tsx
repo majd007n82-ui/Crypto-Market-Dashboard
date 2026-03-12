@@ -1,4 +1,4 @@
-import MarketsGrid from "@/components/markets/MarketsGrid";
+import MarketsLiveSection from "@/components/markets/MarketsLiveSection";
 import { getMarkets24hr } from "@/lib/api/binance";
 
 export default async function HomePage() {
@@ -19,7 +19,7 @@ export default async function HomePage() {
         </p>
       </header>
 
-      <MarketsGrid markets={markets} />
+      <MarketsLiveSection initialMarkets={markets} />
     </main>
   );
 }
