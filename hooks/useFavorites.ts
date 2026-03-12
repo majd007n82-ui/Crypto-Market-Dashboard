@@ -8,7 +8,7 @@ import {
   toggleStoredFavorite,
 } from "@/lib/storage/favorites";
 
-export function useFavorites(symbol: string) {
+export function useFavorites(symbol?: string) {
   const snapshot = useSyncExternalStore(
     subscribeToFavorites,
     getFavoritesStorageSnapshot,
@@ -19,9 +19,10 @@ export function useFavorites(symbol: string) {
     return parseFavoritesSnapshot(snapshot);
   }, [snapshot]);
 
-  const isFavorite = favorites.includes(symbol);
+  const isFavorite = symbol ? favorites.includes(symbol) : false;
 
   const toggleFavorite = useCallback(() => {
+    if (!symbol) return;
     toggleStoredFavorite(symbol);
   }, [symbol]);
 
